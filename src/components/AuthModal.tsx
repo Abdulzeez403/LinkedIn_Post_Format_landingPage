@@ -35,10 +35,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       if (chrome?.runtime?.sendMessage) {
         const response = await chrome.runtime.sendMessage(EXTENSION_ID, {
           type: "STORE_SUPABASE_SESSION",
-          session: {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token,
-          },
+          session,
         });
 
         if (response?.success) {
