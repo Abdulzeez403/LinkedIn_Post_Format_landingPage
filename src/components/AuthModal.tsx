@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Mail, Lock, User, Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { supabase } from "../lib/supabase";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,8 +24,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } =
     useAuth();
-
-  if (!isOpen) return null;
 
   const EXTENSION_ID = "hieapepikblioagpanimpnnpheicdadf";
   const sendSessionToExtension = async (session: any) => {
@@ -52,6 +51,30 @@ const AuthModal: React.FC<AuthModalProps> = ({
       return false;
     }
   };
+
+  const handleOAuthCallback = async () => {
+    const isPendingAuth = localStorage.getItem("sb_pending_auth");
+    if (!isPendingAuth) return;
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        await sendSessionToExtension(session);
+        localStorage.removeItem("sb_pending_auth");
+        onClose();
+      }
+    } catch (err) {
+      console.error("OAuth callback error:", err);
+    }
+  };
+
+  useEffect(() => {
+    handleOAuthCallback();
+  }, []);
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,29 +125,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setLoading(false);
     }
   };
-
-  // // Check for OAuth callback when component mounts
-  // useEffect(() => {
-  //   const handleOAuthCallback = async () => {
-  //     const isPendingAuth = localStorage.getItem("sb_pending_auth");
-  //     if (!isPendingAuth) return;
-
-  //     try {
-  //       const {
-  //         data: { session },
-  //       } = await supabase.auth.getSession();
-  //       if (session) {
-  //         await sendSessionToExtension(session);
-  //         localStorage.removeItem("sb_pending_auth");
-  //         onClose();
-  //       }
-  //     } catch (err) {
-  //       console.error("OAuth callback error:", err);
-  //     }
-  //   };
-
-  //   handleOAuthCallback();
-  // }, []);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

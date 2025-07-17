@@ -1,9 +1,15 @@
-import React from 'react';
-import { Check, Star, Zap } from 'lucide-react';
-import StripeCheckout from './StripeCheckout';
-import { PRICE_IDS } from '../lib/stripe';
+import React from "react";
+import { Check, Star, Zap } from "lucide-react";
+import { useLemon } from "../hooks/useLemonSqueezy";
+const VARIANT_IDS = {
+  PRO_MONTHLY: "YOUR_LEMON_VARIANT_ID",
+};
+
+const STORE_SUBDOMAIN = "yourstore";
 
 const Pricing = () => {
+  const { openCheckout, ready } = useLemon();
+
   const plans = [
     {
       name: "Free",
@@ -14,15 +20,15 @@ const Pricing = () => {
         "Basic formatting (bold, italic)",
         "5 custom templates",
         "Standard support",
-        "Chrome extension access"
+        "Chrome extension access",
       ],
       cta: "Get Started Free",
-      popular: false
+      popular: false,
     },
     {
       name: "Pro",
       price: "9.99",
-      priceId: PRICE_IDS.PRO_MONTHLY,
+      priceId: VARIANT_IDS.PRO_MONTHLY,
       description: "For serious LinkedIn professionals",
       features: [
         "Advanced formatting tools",
@@ -31,11 +37,11 @@ const Pricing = () => {
         "Priority support",
         "Custom branding",
         "Team collaboration",
-        "Export features"
+        "Export features",
       ],
       cta: "Start Pro Trial",
-      popular: true
-    }
+      popular: true,
+    },
   ];
 
   return (
@@ -52,10 +58,12 @@ const Pricing = () => {
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 animate-scale-in hover-lift group ${
-                plan.popular ? 'border-2 border-[#0077B5] transform scale-105' : 'border border-gray-200'
+                plan.popular
+                  ? "border-2 border-[#0077B5] transform scale-105"
+                  : "border border-gray-200"
               }`}
               style={{ animationDelay: `${(index + 3) * 200}ms` }}
             >
@@ -72,9 +80,7 @@ const Pricing = () => {
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
                   {plan.name}
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  {plan.description}
-                </p>
+                <p className="text-gray-600 mb-4">{plan.description}</p>
                 <div className="mb-6">
                   <span className="text-4xl font-bold text-gray-900 group-hover:animate-pulse-gentle">
                     ${plan.price}
@@ -83,31 +89,45 @@ const Pricing = () => {
                     {plan.price === "0" ? "forever" : "/month"}
                   </span>
                 </div>
-                
+
                 {plan.priceId ? (
-                  <StripeCheckout
-                    priceId={plan.priceId}
-                    planName={plan.name}
-                    price={plan.price}
+                  <button
+                    disabled={!ready}
+                    onClick={() => openCheckout(plan.priceId!, STORE_SUBDOMAIN)}
+                    className="w-full bg-[#0077B5] hover:bg-[#005f8f] text-white py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover-scale"
                   >
-                    {plan.popular && <Zap size={20} className="inline mr-2 group-hover:animate-bounce-gentle" />}
-                    <span className="group-hover:animate-bounce-gentle inline-block">{plan.cta}</span>
-                  </StripeCheckout>
+                    {plan.popular && (
+                      <Zap
+                        size={20}
+                        className="inline mr-2 group-hover:animate-bounce-gentle"
+                      />
+                    )}
+                    <span className="group-hover:animate-bounce-gentle inline-block">
+                      {plan.cta}
+                    </span>
+                  </button>
                 ) : (
                   <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover-scale">
-                    <span className="group-hover:animate-bounce-gentle inline-block">{plan.cta}</span>
+                    <span className="group-hover:animate-bounce-gentle inline-block">
+                      {plan.cta}
+                    </span>
                   </button>
                 )}
               </div>
 
               <div className="space-y-4">
                 {plan.features.map((feature, featureIndex) => (
-                  <div 
-                    key={featureIndex} 
+                  <div
+                    key={featureIndex}
                     className="flex items-center gap-3 animate-fade-in-up hover-scale"
-                    style={{ animationDelay: `${(index + featureIndex + 5) * 100}ms` }}
+                    style={{
+                      animationDelay: `${(index + featureIndex + 5) * 100}ms`,
+                    }}
                   >
-                    <Check size={20} className="text-green-500 flex-shrink-0 animate-pulse-gentle" />
+                    <Check
+                      size={20}
+                      className="text-green-500 flex-shrink-0 animate-pulse-gentle"
+                    />
                     <span className="text-gray-700">{feature}</span>
                   </div>
                 ))}

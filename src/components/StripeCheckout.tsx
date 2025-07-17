@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useStripe } from '../hooks/useStripe';
-import { PRICE_IDS } from '../lib/stripe';
-import { Loader2, CreditCard } from 'lucide-react';
+import React, { useState } from "react";
+import { useStripe } from "../hooks/useLemonSqueezy";
+import { PRICE_IDS } from "../lib/stripe";
+import { Loader2, CreditCard } from "lucide-react";
 
 interface StripeCheckoutProps {
   priceId: string;
@@ -17,15 +17,15 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
   planName,
   price,
   customerEmail,
-  className = '',
+  className = "",
   children,
 }) => {
   const { createCheckoutSession, loading, error } = useStripe();
-  const [email, setEmail] = useState(customerEmail || '');
+  const [email, setEmail] = useState(customerEmail || "");
 
   const handleCheckout = async () => {
     if (!email) {
-      alert('Please enter your email address');
+      alert("Please enter your email address");
       return;
     }
 
@@ -36,7 +36,10 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     <div className={`space-y-4 ${className}`}>
       {!customerEmail && (
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Email Address
           </label>
           <input
@@ -61,7 +64,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
         onClick={handleCheckout}
         disabled={loading || !email}
         className={`w-full bg-[#0077B5] hover:bg-[#005885] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover-scale ${
-          loading ? 'animate-pulse' : ''
+          loading ? "animate-pulse" : ""
         }`}
       >
         {loading ? (
